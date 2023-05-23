@@ -1,54 +1,54 @@
 const express = require('express');
+const mongoose = require('mongoose');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+
+const pageRoute = require('./routes/pageRoute');
+const courseRoute = require('./routes/courseRoute');
+const categoryRoute = require('./routes/categoryRoute')
+const userRoute = require('./routes/userRoute')
+
 const app = express();
 
-//Template Engine
+//DATABASE CONNECTION
+mongoose
+  .connect('mongodb://localhost:27017/smartedu', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  .then(() => {
+    console.log('DB connected!');
+  })
+
+//TEMPLATE ENGINE
 app.set('view engine', 'ejs');
 
-//Middlewares
+//MIDDLEWARE
 app.use(express.static('public'));
+app.use(express.json()); // for parsing application/json
+app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+app.use(session({
+  secret: 'my_keyboard_cat',
+  resave: false,
+  saveUninitialized: true,
+  store: MongoStore.create({ mongoUrl: 'mongodb://localhost:27017/smartedu' })
 
-app.get('/', (req, res) => {
-  res.status(200).render('index', {
-    page_name: 'index'
-  });
-});
+}))
 
-app.get('/about', (req, res) => {
-  res.status(200).render('about', {
-    page_name: "about"
-  });
-});
+global.userIN = null;
 
-app.get('/course-single', (req, res) => {
-  res.status(200).render('course-single');
-});
-
-app.get('/courses', (req, res) => {
-  res.status(200).render('courses', {
-    page_name: "courses"
-  });
-});
-
-app.get('/dashboard', (req, res) => {
-  res.status(200).render('dashboard', {
-    page_name: "dashboard"
-  });
-});
-
-app.get('/contact', (req, res) => {
-  res.status(200).render('contact', {
-    page_name: 'contact'
-  })
+app.use('*', (req, res, next) => {
+  userIN = req.session.userID;
+  next();
 })
 
-app.get('/login', (req, res) => {
-  res.status(200).render('login');
-});
+//ROUTES
+app.use('/', pageRoute);
+app.use('/courses', courseRoute);
+app.use('/category', categoryRoute);
+app.use('/user', userRoute);
 
-app.get('/register', (req, res) => {
-  res.status(200).render('register');
-});
-
+//LISTEN
 app.listen(3000, () => {
   console.log('Port çalıştı!');
 });
