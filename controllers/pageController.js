@@ -54,15 +54,15 @@ exports.sendEmail = async (req, res) => {
       port: 465,
       secure: true, // true for 465, false for other ports
       auth: {
-        user: 'biasxloue@gmail.com', // gmail user
-        pass: 'eghxzfhpuqkvgcls', // gmail password
+        user: '', // gmail user
+        pass: '', // gmail password
       },
     });
 
     // send mail with defined transport object
     let info = await transporter.sendMail({
-      from: '"Smart Edu Contact Form" <biasxloue@gmail.com>', // sender address
-      to: 'yenoba8517@cutefier.com', // list of receivers
+      from: '"Smart Edu Contact Form" <', // sender address
+      to: '', // list of receivers
       subject: 'Smart Edu Contact Form New Message', // Subject line
       html: outputMessage, // html body
     });
